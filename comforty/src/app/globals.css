@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --font-inter: var(--font-inter), sans-serif;
+  --dark: #272343;
+  --grayDark: #636270;
+  --grayMedium: #9A9CAA;
+  --grayLight:#F0F2F3;
+  --primary:#029FAE;
+  --primaryHover:#007580;
+  --softRed:#F05C52;
+  --softOrange:#F5813F;
+  --softGreen:#01AD5A;
+}
+
+body {
+  color: var(--dark);
+  background: var(--background);
+  font-family: var(--font-inter)
+}
+
+.text-13{
+  font-size: 13px;
+}
+
+.insta .ptp {
+  display: none;
+}
+
+@layer utilities {
+  /* Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}
