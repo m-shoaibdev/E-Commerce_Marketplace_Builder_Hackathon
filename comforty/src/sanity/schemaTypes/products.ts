@@ -9,6 +9,13 @@ export const productSchema = defineType({
       title: "Product Title",
       name: "title",
       type: "string",
+      validation: (Rule) => Rule.required().error("Product Title is required"),
+    },
+    {
+      title: "Price",
+      name: "price",
+      type: "number",
+      validation: (Rule) => Rule.required().error("Product Price is required"),
     },
     {
       title: "Sale Price",
@@ -16,19 +23,30 @@ export const productSchema = defineType({
       type: "number",
     },
     {
-      title: "Price",
-      name: "price",
-      type: "number",
-    },
-    {
       title: "Badge / Label",
       name: "badge",
-      type: "string",
+      type: "object",
+      fields: [
+        {
+          title: "Text",
+          name: "text",
+          type: "string",
+        },
+        {
+          title: "Color",
+          name: "color",
+          type: "color",
+          options: {
+            colorList: ["#F05C52", "#01AD5A", "#F5813F"],
+          },
+        },
+      ],
     },
     {
       title: "Product Image",
       name: "image",
       type: "image",
+      validation: (Rule) => Rule.required().error("Product Image is required"),
     },
     {
       title: "Category",
@@ -54,6 +72,7 @@ export const productSchema = defineType({
       title: "Stock / Inventory",
       name: "inventory",
       type: "number",
+      validation: (Rule) => Rule.required().error("Stock is required"),
     },
     {
       title: "Tags",

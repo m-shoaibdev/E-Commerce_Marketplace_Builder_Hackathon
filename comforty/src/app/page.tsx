@@ -8,12 +8,12 @@ import TopCategory from "@/components/top-category";
 export default function Home() {
   return (
     <>
-    <HeroSection />
-    <ClientLogos />
-    <FeaturedProducts />
-    <TopCategory />
-    <GalleryGrid />
-    <OurProducts />
+      <HeroSection />
+      <ClientLogos />
+      <FeaturedProducts />
+      <TopCategory />
+      <GalleryGrid />
+      <OurProducts />
     </>
   );
 }

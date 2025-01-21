@@ -9,16 +9,22 @@ export const categorySchema = defineType({
       name: "title",
       title: "Category Title",
       type: "string",
+      validation: (Rule) => Rule.required().error("Category Title is required"),
     },
     {
       name: "image",
       title: "Category Image",
       type: "image",
+      validation: (Rule) => Rule.required().error("Category Image is required"),
     },
     {
-      title: "Number of Products",
-      name: "products",
-      type: "number",
+      title: "Category Slug / URL",
+      name: "slug",
+      type: "slug",
+      options: {
+        source: "title",
+        maxLength: 96,
+      },
     },
     {
       title: "Top Category",

@@ -1,6 +1,6 @@
 // Import environment variables from .env.local
 import "dotenv/config";
-
+// import dotenv from "dotenv";
 // Import the Sanity client to interact with the Sanity backend
 import { createClient } from "@sanity/client";
 
