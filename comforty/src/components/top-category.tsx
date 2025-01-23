@@ -1,7 +1,4 @@
 "use client";
-import cat1 from "@/public/categories/cat-Image1.png";
-import cat2 from "@/public/categories/cat-Image2.png";
-import cat3 from "@/public/categories/cat-Image3.png";
 import CategoryCard from "./category-card";
 import { useEffect, useState } from "react";
 import { client } from "@/sanity/lib/client";
@@ -29,7 +26,9 @@ export default function TopCategory() {
         console.log("categories data =>", categories);
         setTopCategory(categories);
         setLoading(false);
-      } catch (error: any) {
+      }
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+       catch (error: any) {
         setLoading(false);
         setError(error.message);
         console.log("Something wrong happened!", error.message);

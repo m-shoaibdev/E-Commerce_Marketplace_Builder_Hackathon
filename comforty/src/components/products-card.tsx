@@ -41,7 +41,7 @@ export default function ProductsCard({
             <span
               className={`text-xs sm:text-13 ${labelcolor} text-white px-2.5 py-1.5 rounded absolute top-3 left-3 lg:top-5 lg:left-5`}
             >
-              {label}
+              {label.toUpperCase()}
             </span>
           )}
         </div>
@@ -55,10 +55,10 @@ export default function ProductsCard({
             </h4>
           </Link>
           <p className="text-lg font-semibold flex items-center gap-2">
-            ${price}
+            ${salePrice || price}
             {salePrice && (
               <span className="text-sm text-mediumGray line-through">
-                ${salePrice}
+                ${price}
               </span>
             )}
           </p>

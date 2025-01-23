@@ -23,12 +23,14 @@ export default function SingleProduct({ params }: Tparams) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const query = `*[_type == "products" && (slug.current == "${slug}" || _id == "${slug}")][0]{_id,title,price,salePrice,"badge":badge.text,"badgeColor":badge.color.hex,"imageUrl":image.asset->url,rating,inventory,reviews,"category":category->title,description,weight,"lenght":dimensions.length,"width":dimensions.width,"height":dimensions.height}`;
+        const query = `*[_type == "products" && (slug.current == "${slug}" || _id == "${slug}")][0]{_id,title,price,salePrice,"badge":badge.text,"badgeColor":badge.color.value,"imageUrl":image.asset->url,rating,inventory,reviews,"category":category->title,description,weight,"lenght":dimensions.length,"width":dimensions.width,"height":dimensions.height}`;
         const product = await client.fetch(query);
         setProduct(product);
         setLoading(false);
         console.log("Single product data =>", product);
-      } catch (error: any) {
+      }
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+       catch (error: any) {
         setLoading(false);
         setError(error.message);
         console.log("Something wrong happened!", error.message);
@@ -48,7 +50,6 @@ export default function SingleProduct({ params }: Tparams) {
     reviews,
     category,
     description,
-    weight,
     lenght,
     width,
     height,
@@ -72,7 +73,7 @@ export default function SingleProduct({ params }: Tparams) {
           </h1>
         ) : (
           <>
-            <div className="flex-1">
+            <div className="flex-1 relative">
               <Image
                 src={imageUrl || ProductImage}
                 alt="product"
@@ -80,10 +81,17 @@ export default function SingleProduct({ params }: Tparams) {
                 width={550}
                 height={550}
               />
+              {badge && (
+                <span
+                  className={`text-xs sm:text-13 ${badgeColor} text-white px-2.5 py-1.5 rounded absolute top-3 left-3 lg:top-5 lg:left-5`}
+                >
+                  {badge.toUpperCase()}
+                </span>
+              )}
             </div>
             <div className="flex-1 ">
               <h1 className="font-bold text-4xl md:text-5xl lg:text-6xl md:mt-5 mb-7 md:mb-10">
-                {product?.title}
+                {title}
               </h1>
               <div>
                 {salePrice ? (
@@ -105,19 +113,13 @@ export default function SingleProduct({ params }: Tparams) {
               </div>
               {reviews && (
                 <div className="flex items-center gap-2 mt-3">
-                  {`Rating:${rating}`}
-                  {`(${reviews} reviews)`}
+                  {`Rating:${rating}`} {`(${reviews} reviews)`}
                 </div>
               )}
-              <div>
-                {badge && (
-                  <span className={`bg-${badgeColor} text-$`}>{badge}</span>
-                )}
-              </div>
 
-              <div className="border-t border-[#D9D9D9] my-6 md:my-8"></div>
+              {/* <div className="border-t border-[#D9D9D9] my-6 md:my-8"></div> */}
 
-              <p className="text-mediumGray text-base md:text-xl mt-6 mb-8">
+              <p className="text-mediumGray text-base md:text-base mt-6 mb-8">
                 {description}
               </p>
               <Link
@@ -167,17 +169,29 @@ export default function SingleProduct({ params }: Tparams) {
                 Add To Cart
               </Link>
               <div className="border-t border-[#D9D9D9] my-6 md:my-8"></div>
-              {category && "Category: " + category}
-              <div>({inventory} in stock)</div>
-              {}
+              {category && (
+                <p className="text-darkGray text-sm mt-1">
+                  <b>Category:</b> {category}
+                </p>
+              )}
+              {inventory && (
+                <p className="text-darkGray text-sm mt-1">
+                  <b>Availability:</b> {inventory} in stock
+                </p>
+              )}
+              {lenght && width && height && (
+                <p className="text-darkGray text-sm mt-1">
+                  <b>Size:</b> length: {lenght} width: {width} height: {height}
+                </p>
+              )}
             </div>
           </>
         )}
       </div>
-      <div>
-        {/* additonal info */}
+      {/* <div className="lg:container lg:mx-auto px-4 lg:px-10 mt-5 md:mt-16 mb-6 md:mb-20">
         <h2 className="text-2xl font-semibold mb-5">Additional Information</h2>
-      </div>
+        <div className="border-t border-[#D9D9D9] my-6 md:my-8"></div>
+      </div> */}
 
       {/* 5colums single page featured products grid */}
       <SingleFeaturedProducts />

@@ -10,7 +10,6 @@
     "migrate": "node src/scripts/migrata.mjs"
   },
   "dependencies": {
-    "@sanity/color-input": "^4.0.3",
     "@sanity/image-url": "^1.1.0",
     "@sanity/vision": "^3.70.0",
     "dotenv": "^16.4.7",
@@ -19,6 +18,7 @@
     "react": "^18",
     "react-dom": "^18",
     "sanity": "^3.70.0",
+    "sanity-plugin-simpler-color-input": "^3.0.0",
     "styled-components": "^6.1.14"
   },
   "devDependencies": {

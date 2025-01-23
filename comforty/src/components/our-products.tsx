@@ -1,11 +1,4 @@
 "use client";
-import prodcut1 from "@/public/products/Image-1.png";
-import prodcut2 from "@/public/products/Image-2.png";
-import prodcut3 from "@/public/products/Image-3.png";
-import prodcut4 from "@/public/products/Image-4.png";
-import prodcut5 from "@/public/products/Image-5.png";
-import prodcut6 from "@/public/products/Image-6.png";
-import prodcut7 from "@/public/products/Image-7.png";
 
 import ProductsCard from "./products-card";
 import { Tproduct } from "@/types/product";
@@ -22,12 +15,14 @@ export default function OurProducts() {
     const fetchData = async () => {
       try {
         const products = await client.fetch(
-          `*[_type == "products"]| order(_createdAt desc)[0..7]{_id,title,price,salePrice,"badge":badge.text,"badgeColor":badge.color.hex,"imageUrl":image.asset->url,"slug":slug.current}`
+          `*[_type == "products"]| order(_createdAt desc)[0..7]{_id,title,price,salePrice,"badge":badge.text,"badgeColor":badge.color.value,"imageUrl":image.asset->url,"slug":slug.current}`
         );
         console.log("Our products data =>", products);
         setOurProducts(products);
         setLoading(false);
-      } catch (error: any) {
+      } 
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+      catch (error: any) {
         setLoading(false);
         setError(error.message);
         console.log("Something wrong happened!", error.message);
@@ -57,7 +52,7 @@ export default function OurProducts() {
               price={product.price}
               salePrice={product.salePrice}
               label={product.badge}
-              labelcolor="bg-softGreen"
+              labelcolor={product.badgeColor}
             />
           ))}
         </div>

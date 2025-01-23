@@ -35,9 +35,15 @@ export const productSchema = defineType({
         {
           title: "Color",
           name: "color",
-          type: "color",
+          type: "simplerColor",
+          validation: (Rule) =>
+            Rule.required().error("Label Color is required"),
           options: {
-            colorList: ["#F05C52", "#01AD5A", "#F5813F"],
+            colorList: [
+              { label: "Red", value: "bg-softRed" },
+              { label: "Green", value: "bg-softGreen" },
+              { label: "Orange", value: "bg-softOrange" },
+            ],
           },
         },
       ],

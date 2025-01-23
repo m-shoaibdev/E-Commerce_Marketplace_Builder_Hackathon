@@ -10,7 +10,6 @@ import LoadingCircle from "@/components/loading";
 import ErrorMessage from "@/components/error-message";
 import { Tproduct } from "@/types/product";
 
-
 export default function AllProducts() {
   const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,12 +18,14 @@ export default function AllProducts() {
     const fetchData = async () => {
       try {
         const products = await client.fetch(
-          `*[_type == "products"]{_id,title,price,salePrice,"badge":badge.text,"badgeColor":badge.color.hex,"imageUrl":image.asset->url,"slug":slug.current}`
+          `*[_type == "products"]{_id,title,price,salePrice,"badge":badge.text,"badgeColor":badge.color.value,"imageUrl":image.asset->url,"slug":slug.current}`
         );
-        console.log("products data =>", products);
+        console.log("All products data =>", products);
         setAllProducts(products);
         setLoading(false);
-      } catch (error: any) {
+      } 
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+      catch (error: any) {
         setLoading(false);
         setError(error.message);
         console.log("Something wrong happened!", error.message);
@@ -55,7 +56,7 @@ export default function AllProducts() {
                 price={product.price}
                 salePrice={product.salePrice}
                 label={product.badge}
-                // labelcolor={`bg-[${product.badgeColor}]`}
+                labelcolor={product.badgeColor}
               />
             ))}
           </div>
