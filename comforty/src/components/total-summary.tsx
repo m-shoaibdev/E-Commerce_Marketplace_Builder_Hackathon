@@ -22,7 +22,7 @@ export default function TotalSummary() {
         <p>${subtotal.toFixed(2)}</p>
       </div>
       <div className="flex justify-between mb-3">
-        <p>Estimated Delivery & Shipping</p>
+        <p>Estimated Delivery & Handling</p>
         <p>Free</p>
       </div>
       <div className="flex justify-between border-y border-[#D9D9D9] py-4 my-5">

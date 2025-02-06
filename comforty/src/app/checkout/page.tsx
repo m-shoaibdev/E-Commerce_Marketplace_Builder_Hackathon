@@ -85,10 +85,11 @@ export default function CheckOutPage() {
         console.error("Order placement failed");
         return;
       }
-      const { url } = await res.json();
 
+      const { url } = await res.json();
+      // handle redirect to place order
+      handlePlaceOrder();
       if (url) {
-        handlePlaceOrder();
         window.location.href = url;
       }
     } catch (error) {
@@ -102,18 +103,28 @@ export default function CheckOutPage() {
     try {
       await addDoc(collection(db, "Orders"), {
         items: cartProducts,
-        user: { userName, email },
+        user: { userName, email, phone },
         date: new Date().toLocaleDateString(),
         time: new Date().toLocaleTimeString(),
         status: "Pending",
         paymentMethod: "Stripe",
+        shippingDetails: {
+          billingAddress,
+          billingCity,
+          billingPostalCode,
+          billingCountry,
+        },
       });
       localStorage.removeItem("cart");
-      router.push("/order-confirmation");
     } catch (error) {
       console.error(error);
     }
   };
+
+  const subtotal = cartProducts.reduce(
+    (sum, item) => sum + (item.salePrice || item.price) * item.quantity,
+    0
+  );
   return (
     <div className="lg:container lg:mx-auto px-4 lg:px-10 mt-10 md:mt-16 mb-6 md:mb-20">
       {loading ? (
@@ -265,25 +276,41 @@ export default function CheckOutPage() {
                 Complete Details
               </button>
             </div>
-
-            {shippingLoading ? (
-              <div className="">Loading shipping rates...</div>
-            ) : (
-              <div>Shipping Cost: ${shippingCost.toFixed(2)}</div>
-            )}
           </div>
           <div className="p-4 md:w-1/3 mt-10">
-            <TotalSummary />
-            {shippingLoading ? (
-              <div className="text-center">Loading shipping rates...</div>
-            ) : (
-              <div>Shipping Cost: ${shippingCost.toFixed(2)}</div>
-            )}
+            <div className="text-sm">
+              {/* products summary  */}
+              <h2 className="text-2xl md:text-3xl font-semibold mb-8">
+                Summary
+              </h2>
+              <div className="flex justify-between mb-3">
+                <p>Subtotal</p>
+                <p>${subtotal.toFixed(2)}</p>
+              </div>
+              <div className="flex justify-between mb-3">
+                <p>Estimated Delivery & Handling</p>
+                <p>Free</p>
+              </div>
+              {shippingLoading ? (
+                <div className="text-center">Loading shipping rates...</div>
+              ) : (
+                <div className="flex justify-between mb-3">
+                  <p>Shipping Cost</p>
+                  <p>${shippingCost.toFixed(2)}</p>
+                </div>
+              )}
+              <div className="flex justify-between border-y border-[#D9D9D9] py-4 my-5">
+                <p>Total</p>
+                <p>${subtotal.toFixed(2)}</p>
+              </div>
+              {/* <p className="text-[12px] text-center mb-4">TOTAL SAVINGS 25.00</p> */}
+            </div>
+
             <div className="text-center">
               <button
                 title="Pay Now"
                 onClick={handlePayNow}
-                className="bg-primary"
+                className="bg-primary text-white text-sm md:text-base py-2.5 px-4 md:py-3.5 md:px-6 inline-flex gap-2 md:gap-3.5 items-center rounded-lg"
               >
                 Pay Now
               </button>

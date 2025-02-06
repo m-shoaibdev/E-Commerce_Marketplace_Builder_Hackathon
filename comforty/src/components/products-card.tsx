@@ -53,7 +53,7 @@ export default function ProductsCard({
       <div className="flex gap-3 justify-between mt-1.5 ptp">
         {/* title and price */}
         <div className="items-center">
-          <Link href="/all-products/product">
+          <Link href={productUrl || ""}>
             <h4 className="text-base my-2 hover:text-primary group-hover:text-primary">
               {title}
             </h4>
