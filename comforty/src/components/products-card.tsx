@@ -1,29 +1,33 @@
 "use client";
-import Image, { StaticImageData } from "next/image";
+import { ProductsCardProps } from "@/types/product";
+import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-interface ProductsCardProps {
-  image: string | StaticImageData;
-  label?: string;
-  labelcolor?: string;
-  title: string;
-  price: number;
-  salePrice?: number;
-  productUrl?: string;
-}
 
 export default function ProductsCard({
-  image,
+  imageUrl,
   label,
   labelcolor = "bg-softRed",
   title,
   price,
   salePrice,
   productUrl,
+  ...props
 }: ProductsCardProps) {
-  const route = useRouter();
-  function ToCart() {
-    route.push("/cart");
+  const product = { title, imageUrl, price, salePrice, productUrl, ...props };
+
+  function addToCart(item: ProductsCardProps) {
+    console.log("Add to cart =>", item);
+    const cart = JSON.parse(localStorage.getItem("cart") || "{}");
+    if (cart[item.title]) {
+      cart[item.title] = {
+        ...cart[item.title],
+        quantity: cart[item.title].quantity + 1,
+      };
+    } else {
+      cart[item.title] = { ...item, quantity: 1 };
+    }
+    localStorage.setItem("cart", JSON.stringify(cart));
+    console.log(cart);
   }
   return (
     <div>
@@ -31,7 +35,7 @@ export default function ProductsCard({
       <Link href={productUrl || ""}>
         <div className="relative">
           <Image
-            src={image}
+            src={imageUrl}
             alt={title}
             className="w-full h-auto"
             width={500}
@@ -66,7 +70,9 @@ export default function ProductsCard({
         {/* add to cart button */}
         <div className="mt-2.5">
           <button
-            onClick={ToCart}
+            onClick={() => {
+              addToCart(product);
+            }}
             className="bg-lightGray text-dark text-sm md:text-base p-2.5 md:p-3 inline-flex  items-center rounded-lg hover:bg-primary hover:text-white transition duration-300 outline-none focus:outline-none"
           >
             <svg

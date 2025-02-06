@@ -14,14 +14,15 @@ export default function FeaturedProducts() {
     const fetchData = async () => {
       try {
         const products = await client.fetch(
-          `*[_type == "products" && "featured" in tags]{_id,title,price,salePrice,"badge":badge.text,"badgeColor":badge.color.value,"imageUrl":image.asset->url,"slug":slug.current}`
+          `*[_type == "products" && "featured" in tags]{_id,title,price,salePrice,"badge":badge.text,"badgeColor":badge.color.value,"imageUrl":image.asset->url,"slug":slug.current,"category":category->title,description,weight,"lenght":dimensions.length,"width":dimensions.width,"height":dimensions.height}`
         );
         console.log("Featured products data =>", products);
         setFeaturedProducts(products);
         setLoading(false);
-      }
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-       catch (error: any) {
+      } catch (
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        error: any
+      ) {
         setLoading(false);
         setError(error.message);
         console.log("Something wrong happened!", error.message);
@@ -46,12 +47,17 @@ export default function FeaturedProducts() {
             <ProductsCard
               key={product._id + product.slug}
               productUrl={`/products/${product.slug || product._id}`}
-              image={product.imageUrl}
+              imageUrl={product.imageUrl}
               title={product.title}
               price={product.price}
               salePrice={product.salePrice}
               label={product.badge}
               labelcolor={product.badgeColor}
+              category={product.category}
+              width={product.width}
+              height={product.height}
+              lenght={product.lenght}
+              weight={product.weight}
             />
           ))}
         </div>

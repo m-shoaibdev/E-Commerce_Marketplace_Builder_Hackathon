@@ -1,205 +1,296 @@
+"use client";
+import LoadingCircle from "@/components/loading";
+import TotalSummary from "@/components/total-summary";
+import { db } from "@/firebase/firebase-config";
+import { IBag } from "@/types/product";
+import { addDoc, collection } from "firebase/firestore";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
 export default function CheckOutPage() {
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const [userName, setUserName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [billingAddress, setBillingAddress] = useState("");
+  const [billingCity, setBillingCity] = useState("");
+  const [billingPostalCode, setBillingPostalCode] = useState("");
+  const [billingCountry, setBillingCountry] = useState("");
+  const [cartProducts, setCartProducts] = useState<IBag[]>([]);
+  const [shippingCost, setShippingCost] = useState(0);
+  const [shippingLoading, setShippingLoading] = useState(false);
+
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("UserData") || "{}");
+    if (!userData || !userData.userEmail) {
+      router.push("/login");
+      localStorage.setItem("lastVisitedURL", window.location.pathname);
+    } else {
+      const cart = JSON.parse(localStorage.getItem("cart") || "{}") || [];
+      setCartProducts(Object.values(cart));
+      setUserName(userData.userName);
+      setEmail(userData.userEmail);
+      setLoading(false);
+    }
+  }, [router]);
+
+  const handleCheckout = async () => {
+    try {
+      setShippingLoading(true);
+      const res = await fetch("/api/shipping", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          shippingDetails: {
+            userName,
+            email,
+            phone,
+            billingAddress,
+            billingCity,
+            billingPostalCode,
+            billingCountry,
+          },
+          cartProducts,
+        }),
+      });
+
+      const responseData = await res.json();
+      if (responseData.rates?.length) {
+        setShippingCost(responseData.rates[0].shipping_amount.amount);
+      } else {
+        throw new Error(responseData.error || "No shipping rates available.");
+      }
+    } catch (error) {
+      console.error("Shipping Error:", error);
+    } finally {
+      setShippingLoading(false);
+    }
+  };
+
+  const handlePayNow = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: cartProducts,
+          userEmail: email,
+          shippingCost,
+        }),
+      });
+
+      if (!res.ok) {
+        console.error("Order placement failed");
+        return;
+      }
+      const { url } = await res.json();
+
+      if (url) {
+        handlePlaceOrder();
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePlaceOrder = async () => {
+    try {
+      await addDoc(collection(db, "Orders"), {
+        items: cartProducts,
+        user: { userName, email },
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
+        status: "Pending",
+        paymentMethod: "Stripe",
+      });
+      localStorage.removeItem("cart");
+      router.push("/order-confirmation");
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <div className="lg:container lg:mx-auto px-4 lg:px-10 mt-10 md:mt-16 mb-6 md:mb-20">
-      <div className="flex flex-col md:flex-row-reverse gap-6 mt-10 mb-16">
-        <div className="p-4 flex-1">
-          <h2 className="text-2xl font-semibold mb-6">Checkout</h2>
+      {loading ? (
+        <div className="text-center w-full">
+          <LoadingCircle />
+        </div>
+      ) : (
+        <div className="flex flex-col-reverse md:flex-row gap-6 mt-10 mb-16">
+          <div className="p-4 md:w-2/3">
+            <h2 className="text-2xl font-semibold mb-6">Checkout</h2>
 
-          {/* Billing Information */}
-          <div className="mb-4">
-            <label
-              htmlFor="fullName"
-              className="text-black text-base font-semibold"
-            >
-              Full Name
-            </label>
-            <input
-              type="text"
-              name="fullName"
-              id="fullName"
-              placeholder="Your Full Name..."
-              className="border border-gray-300 py-3 px-4 w-full rounded-lg mt-3"
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="text-black text-base font-semibold"
-            >
-              Email Address
-            </label>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              placeholder="Your Email address..."
-              className="border border-gray-300 py-3 px-4 w-full rounded-lg mt-3"
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="billingAddress"
-              className="text-black text-base font-semibold"
-            >
-              Billing Address
-            </label>
-            <input
-              type="text"
-              name="billingAddress"
-              id="billingAddress"
-              placeholder="Your Billing Address..."
-              className="border border-gray-300 py-3 px-4 w-full rounded-lg mt-3"
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="city"
-              className="text-black text-base font-semibold"
-            >
-              City
-            </label>
-            <input
-              type="text"
-              name="city"
-              id="city"
-              placeholder="City..."
-              className="border border-gray-300 py-3 px-4 w-full rounded-lg mt-3"
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="postalCode"
-              className="text-black text-base font-semibold"
-            >
-              Postal Code
-            </label>
-            <input
-              type="text"
-              name="postalCode"
-              id="postalCode"
-              placeholder="Postal Code..."
-              className="border border-gray-300 py-3 px-4 w-full rounded-lg mt-3"
-            />
-          </div>
+            {/* Billing Information */}
+            <div className="mb-4">
+              <label
+                htmlFor="fullName"
+                className="text-black text-base font-semibold"
+              >
+                Full Name
+              </label>
+              <input
+                type="text"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                id="fullName"
+                placeholder="Your Full Name..."
+                className="border border-gray-300 py-3 px-4 w-full rounded-lg mt-3"
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                htmlFor="email"
+                className="text-black text-base font-semibold"
+              >
+                Email Address
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                id="email"
+                placeholder="Your Email address..."
+                className="border border-gray-300 py-3 px-4 w-full rounded-lg mt-3"
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                htmlFor="phone"
+                className="text-black text-base font-semibold"
+              >
+                Phone Number
+              </label>
+              <input
+                type="text"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                id="phone"
+                placeholder="Your Phone Number..."
+                className="border border-gray-300 py-3 px-4 w-full rounded-lg mt-3"
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                htmlFor="billingAddress"
+                className="text-black text-base font-semibold"
+              >
+                Billing Address
+              </label>
+              <input
+                type="text"
+                value={billingAddress}
+                onChange={(e) => setBillingAddress(e.target.value)}
+                id="billingAddress"
+                placeholder="Complete Address (House No. / Street No. / Nearby Place)"
+                className="border border-gray-300 py-3 px-4 w-full rounded-lg mt-3"
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                htmlFor="city"
+                className="text-black text-base font-semibold"
+              >
+                City
+              </label>
+              <input
+                type="text"
+                value={billingCity}
+                onChange={(e) => setBillingCity(e.target.value)}
+                id="city"
+                placeholder="New York"
+                className="border border-gray-300 py-3 px-4 w-full rounded-lg mt-3"
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                htmlFor="country"
+                className="text-black text-base font-semibold"
+              >
+                Country Code
+              </label>
+              <input
+                type="text"
+                value={billingCountry}
+                onChange={(e) => setBillingCountry(e.target.value)}
+                id="country"
+                placeholder="2-letter Country Code, e.g., US, PK"
+                className="border border-gray-300 py-3 px-4 w-full rounded-lg mt-3"
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                htmlFor="postalCode"
+                className="text-black text-base font-semibold"
+              >
+                Postal Code
+              </label>
+              <input
+                type="text"
+                value={billingPostalCode}
+                onChange={(e) => setBillingPostalCode(e.target.value)}
+                id="postalCode"
+                placeholder="10001"
+                className="border border-gray-300 py-3 px-4 w-full rounded-lg mt-3"
+              />
+            </div>
 
-          {/* Shipping Information */}
-          <div className="mb-4">
-            <label
-              htmlFor="shippingAddress"
-              className="text-black text-base font-semibold"
-            >
-              Shipping Address (if different)
-            </label>
-            <input
-              type="text"
-              name="shippingAddress"
-              id="shippingAddress"
-              placeholder="Your Shipping Address..."
-              className="border border-gray-300 py-3 px-4 w-full rounded-lg mt-3"
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="shippingCity"
-              className="text-black text-base font-semibold"
-            >
-              Shipping City
-            </label>
-            <input
-              type="text"
-              name="shippingCity"
-              id="shippingCity"
-              placeholder="Shipping City..."
-              className="border border-gray-300 py-3 px-4 w-full rounded-lg mt-3"
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="shippingPostalCode"
-              className="text-black text-base font-semibold"
-            >
-              Shipping Postal Code
-            </label>
-            <input
-              type="text"
-              name="shippingPostalCode"
-              id="shippingPostalCode"
-              placeholder="Shipping Postal Code..."
-              className="border border-gray-300 py-3 px-4 w-full rounded-lg mt-3"
-            />
-          </div>
+            {/* Terms & Conditions */}
+            <div className="mb-4 flex items-center">
+              <input
+                type="checkbox"
+                name="acceptTerms"
+                id="acceptTerms"
+                className="mr-2"
+              />
+              <label htmlFor="acceptTerms" className="text-sm">
+                I agree to the{" "}
+                <a href="#" className="text-primary">
+                  Terms and Conditions
+                </a>
+                .
+              </label>
+            </div>
 
-          {/* Payment Information */}
-          <div className="mb-4">
-            <label
-              htmlFor="cardNumber"
-              className="text-black text-base font-semibold"
-            >
-              Credit Card Number
-            </label>
-            <input
-              type="text"
-              name="cardNumber"
-              id="cardNumber"
-              placeholder="Enter your Credit Card Number..."
-              className="border border-gray-300 py-3 px-4 w-full rounded-lg mt-3"
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="expirationDate"
-              className="text-black text-base font-semibold"
-            >
-              Expiration Date
-            </label>
-            <input
-              type="text"
-              name="expirationDate"
-              id="expirationDate"
-              placeholder="MM/YY"
-              className="border border-gray-300 py-3 px-4 w-full rounded-lg mt-3"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="cvv" className="text-black text-base font-semibold">
-              CVV
-            </label>
-            <input
-              type="text"
-              name="cvv"
-              id="cvv"
-              placeholder="CVV"
-              className="border border-gray-300 py-3 px-4 w-full rounded-lg mt-3"
-            />
-          </div>
+            {/* Submit Button */}
+            <div className="mb-4">
+              <button
+                onClick={handleCheckout}
+                className="bg-primary text-white text-base md:text-lg py-2.5 md:py-3 px-4 md:px-6 rounded-lg outline-none focus:outline-none"
+              >
+                Complete Details
+              </button>
+            </div>
 
-          {/* Terms & Conditions */}
-          <div className="mb-4 flex items-center">
-            <input
-              type="checkbox"
-              name="acceptTerms"
-              id="acceptTerms"
-              className="mr-2"
-            />
-            <label htmlFor="acceptTerms" className="text-sm">
-              I agree to the{" "}
-              <a href="/terms" className="text-blue-600">
-                Terms and Conditions
-              </a>
-              .
-            </label>
+            {shippingLoading ? (
+              <div className="">Loading shipping rates...</div>
+            ) : (
+              <div>Shipping Cost: ${shippingCost.toFixed(2)}</div>
+            )}
           </div>
-
-          {/* Submit Button */}
-          <div className="mb-4">
-            <button className="bg-primary text-white text-base md:text-lg py-2.5 md:py-3 px-4 md:px-6 rounded-lg outline-none focus:outline-none">
-              Complete Purchase
-            </button>
+          <div className="p-4 md:w-1/3 mt-10">
+            <TotalSummary />
+            {shippingLoading ? (
+              <div className="text-center">Loading shipping rates...</div>
+            ) : (
+              <div>Shipping Cost: ${shippingCost.toFixed(2)}</div>
+            )}
+            <div className="text-center">
+              <button
+                title="Pay Now"
+                onClick={handlePayNow}
+                className="bg-primary"
+              >
+                Pay Now
+              </button>
+            </div>
           </div>
         </div>
-
-        <div className="p-4 flex flex-col gap-12 mt-10"></div>
-      </div>
+      )}
     </div>
   );
 }

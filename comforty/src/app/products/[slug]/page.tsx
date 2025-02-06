@@ -5,7 +5,7 @@ import ProductImage from "@/public/single-Image.png";
 import Link from "next/link";
 import { client } from "@/sanity/lib/client";
 import { useEffect, useState } from "react";
-import { TsingleProduct } from "@/types/product";
+import { ProductsCardProps, TsingleProduct } from "@/types/product";
 import LoadingCircle from "@/components/loading";
 import ErrorMessage from "@/components/error-message";
 
@@ -28,9 +28,10 @@ export default function SingleProduct({ params }: Tparams) {
         setProduct(product);
         setLoading(false);
         console.log("Single product data =>", product);
-      }
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-       catch (error: any) {
+      } catch (
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        error: any
+      ) {
         setLoading(false);
         setError(error.message);
         console.log("Something wrong happened!", error.message);
@@ -53,7 +54,37 @@ export default function SingleProduct({ params }: Tparams) {
     lenght,
     width,
     height,
+    weight,
   } = product || {};
+
+  const cartProduct = {
+    title,
+    imageUrl,
+    price,
+    salePrice,
+    productUrl: "/products/" + slug,
+    category,
+    weight,
+    lenght,
+    width,
+    height,
+  };
+
+  function addToCart(item: ProductsCardProps) {
+    console.log("Add to cart =>", item);
+    const cart = JSON.parse(localStorage.getItem("cart") || "{}");
+    if (cart[item.title]) {
+      cart[item.title] = {
+        ...cart[item.title],
+        quantity: cart[item.title].quantity + 1,
+      };
+    } else {
+      cart[item.title] = { ...item, quantity: 1 };
+    }
+    localStorage.setItem("cart", JSON.stringify(cart));
+    console.log(cart);
+  }
+
   return (
     <>
       <div className="lg:container lg:mx-auto px-4 lg:px-10 mt-10 md:mt-16 mb-6 md:mb-20 flex flex-col md:flex-row gap-10 lg:gap-20">
@@ -122,8 +153,10 @@ export default function SingleProduct({ params }: Tparams) {
               <p className="text-mediumGray text-base md:text-base mt-6 mb-8">
                 {description}
               </p>
-              <Link
-                href="#"
+              <button
+                onClick={() => {
+                  addToCart(cartProduct as ProductsCardProps);
+                }}
                 className="bg-primary text-white text-base md:text-xl py-2.5 px-4 md:py-3.5 md:px-6 inline-flex gap-3.5 items-center rounded-lg"
               >
                 <svg
@@ -167,7 +200,7 @@ export default function SingleProduct({ params }: Tparams) {
                   />
                 </svg>
                 Add To Cart
-              </Link>
+              </button>
               <div className="border-t border-[#D9D9D9] my-6 md:my-8"></div>
               {category && (
                 <p className="text-darkGray text-sm mt-1">
