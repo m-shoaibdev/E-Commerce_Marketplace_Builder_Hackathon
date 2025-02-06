@@ -1,6 +1,5 @@
 "use client";
 import LoadingCircle from "@/components/loading";
-import TotalSummary from "@/components/total-summary";
 import { db } from "@/firebase/firebase-config";
 import { IBag } from "@/types/product";
 import { addDoc, collection } from "firebase/firestore";
