@@ -204,7 +204,13 @@ export default function SingleProduct({ params }: Tparams) {
               <div className="border-t border-[#D9D9D9] my-6 md:my-8"></div>
               {category && (
                 <p className="text-darkGray text-sm mt-1">
-                  <b>Category:</b> {category}
+                  <b>Category:</b>{" "}
+                  <Link
+                    className="hover:text-primary"
+                    href={`/categories/${category?.toLowerCase().replace(/\s+/g, "-")}`}
+                  >
+                    {category}
+                  </Link>
                 </p>
               )}
               {inventory && (

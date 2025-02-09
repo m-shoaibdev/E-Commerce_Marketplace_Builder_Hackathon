@@ -31,7 +31,12 @@ export default function CartBag({
           </div>
           {category && (
             <p className="text-sm md:text-base text-mediumGray mb-2">
-              {category}
+              <Link
+                className="hover:text-primary"
+                href={`/categories/${category?.toLowerCase().replace(/\s+/g, "-")}`}
+              >
+                {category}
+              </Link>
             </p>
           )}
           <p className="text-sm md:text-base text-mediumGray mb-3">
