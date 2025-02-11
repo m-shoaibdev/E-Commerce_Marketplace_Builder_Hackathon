@@ -15,6 +15,28 @@ export default function Cart() {
     setCartProducts(items);
   }, []);
 
+  // Update quantity function
+  const updateQuantity = (title: string, newQty: number) => {
+    const cartData = localStorage.getItem("cart");
+    const cart = cartData ? JSON.parse(cartData) : {}; // Ensure cart is an object
+
+    if (cart[title]) {
+      cart[title].quantity = newQty;
+    }
+
+    setCartProducts(Object.values(cart) as IBag[]); // Convert object to array for UI
+    localStorage.setItem("cart", JSON.stringify(cart)); // Save updated object
+  };
+  const removeItem = (title: string) => {
+    const cartData = localStorage.getItem("cart");
+    const cart = cartData ? JSON.parse(cartData) : {};
+
+    delete cart[title];
+
+    setCartProducts(Object.values(cart) as IBag[]);
+    localStorage.setItem("cart", JSON.stringify(cart));
+  };
+
   return (
     <div className="lg:container lg:mx-auto px-4 lg:px-10 mt-10 md:mt-16 mb-6 md:mb-20">
       <h2 className="text-2xl md:text-3xl font-semibold mb-2">Bag</h2>
@@ -41,6 +63,10 @@ export default function Cart() {
                 quantity={cartItem.quantity}
                 favorite={true}
                 productUrl={cartItem.productUrl}
+                onUpdateQuantity={(newQty) =>
+                  updateQuantity(cartItem.title, newQty)
+                }
+                onRemove={() => removeItem(cartItem.title)}
               />
             ))
           )}
