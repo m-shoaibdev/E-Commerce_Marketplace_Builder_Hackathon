@@ -1,14 +1,9 @@
-"use client";
 import { IBag } from "@/types/product";
-import React, { useEffect, useState } from "react";
 
-export default function TotalSummary() {
-  const [cartProducts, setCartProducts] = useState<IBag[]>([]);
-  useEffect(() => {
-    const cart = JSON.parse(localStorage.getItem("cart") || "{}");
-    const items = Object.values(cart) as IBag[];
-    setCartProducts(items);
-  }, []);
+interface Props {
+  cartProducts: IBag[];
+}
+export default function TotalSummary({ cartProducts }: Props) {
   const subtotal = cartProducts.reduce(
     (sum, item) => sum + (item.salePrice || item.price) * item.quantity,
     0

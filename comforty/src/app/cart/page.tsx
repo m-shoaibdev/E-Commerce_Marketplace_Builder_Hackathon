@@ -73,7 +73,7 @@ export default function Cart() {
         </div>
 
         <div className="md:col-span-1 md:row-span-1 md:col-start-3 md:row-start-1 text-sm">
-          <TotalSummary />
+          <TotalSummary cartProducts={cartProducts} />
           <div className="text-center">
             {cartProducts.length > 0 && (
               <Button title="Member Checkout" href="/checkout" />
