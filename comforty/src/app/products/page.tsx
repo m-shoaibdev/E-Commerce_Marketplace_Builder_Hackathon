@@ -25,11 +25,7 @@ export default function AllProducts() {
         error: any
       ) {
         setLoading(false);
-        if (!navigator.onLine) {
-          setError("No internet connection. Please check your network.");
-        } else {
-          setError(error.message);
-        }
+        setError(error.message);
         console.log("Something wrong happened!", error.message);
       }
     };

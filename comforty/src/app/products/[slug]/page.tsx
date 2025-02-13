@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { ProductsCardProps, TsingleProduct } from "@/types/product";
 import LoadingCircle from "@/components/loading";
 import ErrorMessage from "@/components/error-message";
+import clsx from "clsx";
 
 type Tparams = {
   params: {
@@ -56,6 +57,12 @@ export default function SingleProduct({ params }: Tparams) {
     height,
     weight,
   } = product || {};
+
+  const isLabelColor = clsx(
+    badgeColor === "#f05c52" && "bg-softRed",
+    badgeColor === "#f5813f" && "bg-softOrange",
+    badgeColor === "#01ad5a" && "bg-softGreen"
+  );
 
   const cartProduct = {
     title,
@@ -114,7 +121,10 @@ export default function SingleProduct({ params }: Tparams) {
               />
               {badge && (
                 <span
-                  className={`text-xs sm:text-13 ${badgeColor} text-white px-2.5 py-1.5 rounded absolute top-3 left-3 lg:top-5 lg:left-5`}
+                  className={clsx(
+                    "text-xs sm:text-13  text-white px-2.5 py-1.5 rounded absolute top-3 left-3 lg:top-5 lg:left-5",
+                    isLabelColor
+                  )}
                 >
                   {badge.toUpperCase()}
                 </span>
@@ -233,7 +243,7 @@ export default function SingleProduct({ params }: Tparams) {
       </div> */}
 
       {/* 5colums single page featured products grid */}
-      <SingleFeaturedProducts />
+      <SingleFeaturedProducts productUrl={slug} />
     </>
   );
 }

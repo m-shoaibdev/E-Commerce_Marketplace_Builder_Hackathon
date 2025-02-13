@@ -40,9 +40,9 @@ export const productSchema = defineType({
             Rule.required().error("Label Color is required"),
           options: {
             colorList: [
-              { label: "Red", value: "bg-softRed" },
-              { label: "Green", value: "bg-softGreen" },
-              { label: "Orange", value: "bg-softOrange" },
+              { label: "Red", value: "#f05c52" },
+              { label: "Green", value: "#01ad5a" },
+              { label: "Orange", value: "#f5813f" },
             ],
           },
         },

@@ -6,7 +6,11 @@ import { Tproduct } from "@/types/product";
 import LoadingCircle from "./loading";
 import ErrorMessage from "./error-message";
 
-export default function SingleFeaturedProducts() {
+export default function SingleFeaturedProducts({
+  productUrl,
+}: {
+  productUrl: string;
+}) {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -48,24 +52,29 @@ export default function SingleFeaturedProducts() {
       ) : (
         <div className="grid grid-flow-col lg:grid-cols-5 gap-5 md:gap-6 mt-6 mb-10 scroll-smooth overflow-x-auto justify-between no-scrollbar">
           {/* products card component */}
-          {featuredProducts.map((product: Tproduct) => (
-            <div className="w-40 lg:w-auto" key={product._id + product.slug}>
-              <ProductsCard
-                productUrl={`/products/${product.slug || product._id}`}
-                imageUrl={product.imageUrl}
-                title={product.title}
-                price={product.price}
-                salePrice={product.salePrice}
-                label={product.badge}
-                labelcolor={product.badgeColor}
-                category={product.category}
-                width={product.width}
-                height={product.height}
-                lenght={product.lenght}
-                weight={product.weight}
-              />
-            </div>
-          ))}
+          {featuredProducts
+            .filter(
+              (product: Tproduct) =>
+                (product.slug || product._id) !== productUrl
+            )
+            .map((product: Tproduct) => (
+              <div className="w-40 lg:w-auto" key={product._id + product.slug}>
+                <ProductsCard
+                  productUrl={`/products/${product.slug || product._id}`}
+                  imageUrl={product.imageUrl}
+                  title={product.title}
+                  price={product.price}
+                  salePrice={product.salePrice}
+                  label={product.badge}
+                  labelcolor={product.badgeColor}
+                  category={product.category}
+                  width={product.width}
+                  height={product.height}
+                  lenght={product.lenght}
+                  weight={product.weight}
+                />
+              </div>
+            ))}
         </div>
       )}
       <div className="text-center md:hidden">

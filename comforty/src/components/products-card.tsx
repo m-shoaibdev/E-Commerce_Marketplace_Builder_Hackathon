@@ -2,17 +2,22 @@
 import { ProductsCardProps } from "@/types/product";
 import Image from "next/image";
 import Link from "next/link";
-
+import clsx from "clsx";
 export default function ProductsCard({
   imageUrl,
   label,
-  labelcolor = "bg-softRed",
+  labelcolor,
   title,
   price,
   salePrice,
   productUrl,
   ...props
 }: ProductsCardProps) {
+  const isLabelColor = clsx(
+    labelcolor === "#f05c52" && "bg-softRed",
+    labelcolor === "#f5813f" && "bg-softOrange",
+    labelcolor === "#01ad5a" && "bg-softGreen"
+  );
   const product = { title, imageUrl, price, salePrice, productUrl, ...props };
 
   function addToCart(item: ProductsCardProps) {
@@ -43,7 +48,10 @@ export default function ProductsCard({
           />
           {label && (
             <span
-              className={`text-xs sm:text-13 ${labelcolor} text-white px-2.5 py-1.5 rounded absolute top-3 left-3 lg:top-5 lg:left-5`}
+              className={clsx(
+                "text-xs sm:text-13  text-white px-2.5 py-1.5 rounded absolute top-3 left-3 lg:top-5 lg:left-5",
+                isLabelColor
+              )}
             >
               {label.toUpperCase()}
             </span>
