@@ -1,19 +1,41 @@
 "use client";
+import ErrorMessage from "@/components/error-message";
 import { app } from "@/firebase/firebase-config";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function LoginPage() {
   const [userEmail, setUserEmail] = useState("");
   const [password, setPassword] = useState("");
   const auth = getAuth(app);
   const router = useRouter();
-  // Store the last visited URL before redirecting to login
+  const [isLoading, setLoading] = useState(false);
+  const [isError, setError] = useState("");
+
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("UserData") || "{}");
+    if (userData && userData.userEmail) {
+      router.push("/");
+    }
+  }, [router]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setError("");
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [isError]);
 
   const handleSubmit = (userEmail: string, password: string) => {
+    setLoading(true);
+    if (!userEmail || !password) {
+      setError("Please enter email and password");
+      setLoading(false);
+      return;
+    }
     signInWithEmailAndPassword(auth, userEmail, password)
       .then((userCredential) => {
         // Signed in
@@ -33,8 +55,16 @@ export default function LoginPage() {
       })
       .catch((error) => {
         const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
+        console.log(errorCode);
+        errorCode === "auth/invalid-email" && setError("Invalid email");
+        errorCode === "auth/wrong-password" && setError("Wrong password");
+        errorCode === "auth/invalid-credential" &&
+          setError("Invalid email or password");
+        errorCode === "auth/network-request-failed" &&
+          setError("Network error");
+        errorCode === "auth/too-many-requests" && setError("Too many requests");
+        errorCode === "auth/user-not-found" && setError("User not found");
+        setLoading(false);
       });
   };
 
@@ -75,7 +105,7 @@ export default function LoginPage() {
             className="border border-gray-300 py-3 px-4 w-full rounded-lg mt-3"
           />
         </div>
-
+        {isError && <ErrorMessage message={isError} />}
         {/* Submit Button */}
         <div className="mb-4 text-center">
           <div className="text-sm mb-3">
@@ -89,7 +119,7 @@ export default function LoginPage() {
             onClick={() => handleSubmit(userEmail, password)}
             className="bg-primary text-white text-base md:text-lg py-2.5 md:py-3 px-4 md:px-6 rounded-lg outline-none focus:outline-none"
           >
-            Sign In
+            {isLoading ? "Loading..." : "Sign In"}
           </button>
         </div>
       </div>

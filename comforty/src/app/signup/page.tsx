@@ -1,11 +1,12 @@
 "use client";
+import ErrorMessage from "@/components/error-message";
 import { app, db } from "@/firebase/firebase-config";
 import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function SignUpPage() {
   const [userName, setUserName] = useState("");
@@ -13,12 +14,34 @@ export default function SignUpPage() {
   const [password, setPassword] = useState("");
   const auth = getAuth(app);
   const router = useRouter();
+  const [isLoading, setLoading] = useState(false);
+  const [isError, setError] = useState("");
+
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("UserData") || "{}");
+    if (userData && userData.userEmail) {
+      router.push("/");
+    }
+  }, [router]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setError("");
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [isError]);
 
   const handleSubmit = (
     userName: string,
     userEmail: string,
     password: string
   ) => {
+    setLoading(true);
+    if (!userEmail || !password) {
+      setError("Please enter email and password");
+      setLoading(false);
+      return;
+    }
     createUserWithEmailAndPassword(auth, userEmail, password)
       .then((userCredential) => {
         const user = userCredential.user;
@@ -30,9 +53,13 @@ export default function SignUpPage() {
       })
       .catch((error) => {
         const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
-        // ..
+        // const errorMessage = error.message;
+        console.log(errorCode);
+        errorCode === "auth/invalid-email" && setError("Invalid email");
+        errorCode === "auth/weak-password" && setError("Weak password");
+        errorCode === "auth/email-already-in-use" &&
+          setError("Email already in use");
+        setLoading(false);
       });
   };
 
@@ -109,7 +136,7 @@ export default function SignUpPage() {
             className="border border-gray-300 py-3 px-4 w-full rounded-lg mt-3"
           />
         </div>
-
+        {isError && <ErrorMessage message={isError} />}
         {/* Submit Button */}
         <div className="mb-4 text-center">
           <div className="text-sm mb-3">
@@ -123,7 +150,7 @@ export default function SignUpPage() {
             onClick={() => handleSubmit(userName, userEmail, password)}
             className="bg-primary text-white text-base md:text-lg py-2.5 md:py-3 px-4 md:px-6 rounded-lg outline-none focus:outline-none"
           >
-            Sign Up
+            {isLoading ? "Loading..." : "Sign Up"}
           </button>
         </div>
       </div>
