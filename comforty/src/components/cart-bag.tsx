@@ -38,11 +38,13 @@ export default function CartBag({
           height={300}
         />
         <div className="w-full">
-          <div className="flex gap-4 justify-between mb-7 text-base md:text-lg">
+          <div className="flex gap-4 justify-between sm:mb-7 text-base md:text-lg">
             <Link href={productUrl} className="hover:text-primary">
               {title}
             </Link>
-            <p>MRP: ${price && (salePrice || price) * quantity}</p>
+            <p className="text-right grow-0">
+              MRP: ${price && (salePrice || price) * quantity}
+            </p>
           </div>
           {category && (
             <p className="text-sm md:text-base text-mediumGray mb-2">
@@ -54,12 +56,14 @@ export default function CartBag({
               </Link>
             </p>
           )}
-          <div className="text-sm md:text-base text-mediumGray mb-3 flex items-center">
-            <span className="mr-5 :mr-10">Price: ${salePrice || price}</span>
+          <div className="text-sm md:text-base text-mediumGray mb-3 flex-col sm:flex-row flex sm:items-center">
+            <span className="mr-5 md:mr-10 mb-1 sm:mb-0">
+              Price: ${salePrice || price}
+            </span>
             <span className="mr-1">Quantity:</span>
             <div className="flex items-center gap-4">
               <button
-                className="border px-3 py-1 text-lg disabled:opacity-50"
+                className="border px-2 sm:px-3 sm:py-1 md:text-lg disabled:opacity-50"
                 onClick={() => handleQuantityChange(itemQuantity - 1)}
                 disabled={itemQuantity <= 1}
               >
@@ -67,7 +71,7 @@ export default function CartBag({
               </button>
               <span className="">{itemQuantity}</span>
               <button
-                className="border px-3 py-1 text-lg"
+                className="border px-2 sm:px-3 sm:py-1 md:text-lg"
                 onClick={() => handleQuantityChange(itemQuantity + 1)}
               >
                 +
@@ -81,7 +85,7 @@ export default function CartBag({
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className={`size-6 ${favorite ? "fill-red-500 stroke-red-500" : " hover:fill-red-500 hover:stroke-red-500"} hover:cursor-pointer`}
+              className={`size-4 sm:size-6 ${favorite ? "fill-red-500 stroke-red-500" : " hover:fill-red-500 hover:stroke-red-500"} hover:cursor-pointer`}
             >
               <path
                 strokeLinecap="round"
@@ -96,7 +100,7 @@ export default function CartBag({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-6"
+                className="size-4 sm:size-6"
               >
                 <path
                   strokeLinecap="round"

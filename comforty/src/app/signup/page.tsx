@@ -56,7 +56,7 @@ export default function SignUpPage() {
 
   return (
     <div className="lg:container lg:mx-auto px-4 lg:px-10 mt-10 md:mt-16 mb-6 md:mb-20">
-      <div className="p-4 w-1/2 mx-auto">
+      <div className="p-4 sm:w-1/2 mx-auto">
         <h2 className="text-2xl font-semibold mb-6 text-center">Sign Up</h2>
 
         {/* Full Name */}
