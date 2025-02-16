@@ -19,7 +19,7 @@ export default function SignUpPage() {
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("UserData") || "{}");
-    if (userData && userData.userEmail) {
+    if (userData && userData.uid) {
       router.push("/");
     }
   }, [router]);
@@ -30,6 +30,12 @@ export default function SignUpPage() {
     }, 4000);
     return () => clearTimeout(timer);
   }, [isError]);
+
+  const errorMessages = {
+    "auth/invalid-email": "Invalid email",
+    "auth/weak-password": "Weak password",
+    "auth/email-already-in-use": "Email already in use",
+  };
 
   const handleSubmit = (
     userName: string,
@@ -52,13 +58,9 @@ export default function SignUpPage() {
         setPassword("");
       })
       .catch((error) => {
-        const errorCode = error.code;
-        // const errorMessage = error.message;
+        const errorCode = error.code as keyof typeof errorMessages;
         console.log(errorCode);
-        errorCode === "auth/invalid-email" && setError("Invalid email");
-        errorCode === "auth/weak-password" && setError("Weak password");
-        errorCode === "auth/email-already-in-use" &&
-          setError("Email already in use");
+        setError(errorMessages[errorCode]);
         setLoading(false);
       });
   };

@@ -5,6 +5,7 @@ import { IBag } from "@/types/product";
 import TotalSummary from "@/components/total-summary";
 import Button from "@/components/button";
 import Link from "next/link";
+import { Bounce, ToastContainer, toast } from "react-toastify";
 
 export default function Cart() {
   const [cartProducts, setCartProducts] = useState<IBag[]>([]);
@@ -28,6 +29,17 @@ export default function Cart() {
     localStorage.setItem("cart", JSON.stringify(cart)); // Save updated object
   };
   const removeItem = (title: string) => {
+    toast.error(title + " removed from cart", {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: false,
+      draggable: false,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
     const cartData = localStorage.getItem("cart");
     const cart = cartData ? JSON.parse(cartData) : {};
 
@@ -39,6 +51,7 @@ export default function Cart() {
 
   return (
     <div className="lg:container lg:mx-auto px-4 lg:px-10 mt-10 md:mt-16 mb-6 md:mb-20">
+      <ToastContainer />
       <h2 className="text-2xl md:text-3xl font-semibold mb-2">Bag</h2>
       <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 md:grid-rows-1 gap-10 mt-0 mb-16">
         <div className="md:col-span-2 pt-4">

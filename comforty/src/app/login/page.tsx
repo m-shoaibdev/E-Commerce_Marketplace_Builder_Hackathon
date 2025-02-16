@@ -17,7 +17,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("UserData") || "{}");
-    if (userData && userData.userEmail) {
+    if (userData && userData.uid) {
       router.push("/");
     }
   }, [router]);
@@ -28,6 +28,15 @@ export default function LoginPage() {
     }, 4000);
     return () => clearTimeout(timer);
   }, [isError]);
+
+  const errorMessages = {
+    "auth/invalid-email": "Invalid email",
+    "auth/wrong-password": "Wrong password",
+    "auth/invalid-credential": "Invalid email or password",
+    "auth/network-request-failed": "Network error",
+    "auth/too-many-requests": "Too many requests, try again later",
+    "auth/user-not-found": "User not found",
+  };
 
   const handleSubmit = (userEmail: string, password: string) => {
     setLoading(true);
@@ -54,16 +63,9 @@ export default function LoginPage() {
         router.push(lastVisited);
       })
       .catch((error) => {
-        const errorCode = error.code;
+        const errorCode = error.code as keyof typeof errorMessages;
         console.log(errorCode);
-        errorCode === "auth/invalid-email" && setError("Invalid email");
-        errorCode === "auth/wrong-password" && setError("Wrong password");
-        errorCode === "auth/invalid-credential" &&
-          setError("Invalid email or password");
-        errorCode === "auth/network-request-failed" &&
-          setError("Network error");
-        errorCode === "auth/too-many-requests" && setError("Too many requests");
-        errorCode === "auth/user-not-found" && setError("User not found");
+        setError(errorMessages[errorCode]);
         setLoading(false);
       });
   };

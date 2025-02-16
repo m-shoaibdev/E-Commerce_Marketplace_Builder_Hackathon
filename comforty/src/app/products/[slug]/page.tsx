@@ -9,7 +9,7 @@ import { ProductsCardProps, TsingleProduct } from "@/types/product";
 import LoadingCircle from "@/components/loading";
 import ErrorMessage from "@/components/error-message";
 import clsx from "clsx";
-
+import { Bounce, ToastContainer, toast } from "react-toastify";
 type Tparams = {
   params: {
     slug: string;
@@ -79,6 +79,17 @@ export default function SingleProduct({ params }: Tparams) {
 
   function addToCart(item: ProductsCardProps) {
     console.log("Add to cart =>", item);
+    toast.success(item.title + " added to cart", {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
     const cart = JSON.parse(localStorage.getItem("cart") || "{}");
     if (cart[item.title]) {
       cart[item.title] = {
@@ -111,6 +122,7 @@ export default function SingleProduct({ params }: Tparams) {
           </h1>
         ) : (
           <>
+            <ToastContainer />
             <div className="flex-1 relative">
               <Image
                 src={imageUrl || ProductImage}

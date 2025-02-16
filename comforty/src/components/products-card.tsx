@@ -3,6 +3,8 @@ import { ProductsCardProps } from "@/types/product";
 import Image from "next/image";
 import Link from "next/link";
 import clsx from "clsx";
+import { Bounce, ToastContainer, toast } from "react-toastify";
+
 export default function ProductsCard({
   imageUrl,
   label,
@@ -21,6 +23,17 @@ export default function ProductsCard({
   const product = { title, imageUrl, price, salePrice, productUrl, ...props };
 
   function addToCart(item: ProductsCardProps) {
+    toast.success(item.title + " added to cart", {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
     console.log("Add to cart =>", item);
     const cart = JSON.parse(localStorage.getItem("cart") || "{}");
     if (cart[item.title]) {
@@ -36,6 +49,7 @@ export default function ProductsCard({
   }
   return (
     <div>
+      <ToastContainer />
       {/* image and label */}
       <Link href={productUrl || ""}>
         <div className="relative">

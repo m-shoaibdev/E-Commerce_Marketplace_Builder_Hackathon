@@ -1,9 +1,23 @@
+"use client";
 import Image from "next/image";
 import Logo from "@/public/logos/Logo.png";
 import Link from "next/link";
 import Navbar from "./navbar";
+import { useEffect, useState } from "react";
 
 export default function Header() {
+  const [userName, setUserName] = useState("");
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("UserData") || "{}");
+    if (userData && userData.uid) {
+      // first name
+      const userName = userData.userName || userData.userEmail.split("@")[0];
+      setUserName(userName);
+    } else {
+      setUserName("");
+    }
+  }, [userName]);
+
   return (
     <header>
       {/* Top bar */}
@@ -40,12 +54,33 @@ export default function Header() {
 
                             </Link>
                         </li> */}
-            <li>
-              <Link href="/login">Login</Link>
-            </li>
-            <li>
-              <Link href="/signup">Sign Up</Link>
-            </li>
+            {userName ? (
+              <>
+                <li>
+                  <Link href="/profile">{userName}</Link>
+                </li>
+                <li>
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem("UserData");
+                      localStorage.removeItem("lastVisitedURL");
+                      window.location.reload();
+                    }}
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
+            ) : (
+              <>
+                <li>
+                  <Link href="/login">Login</Link>
+                </li>
+                <li>
+                  <Link href="/signup">Sign Up</Link>
+                </li>
+              </>
+            )}
           </ul>
           <p className="flex gap-1 items-center">
             <svg
